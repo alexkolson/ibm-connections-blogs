@@ -69,3 +69,27 @@ test('create blog post in blog with given handle', async (t) => {
 
   t.truthy(createdPost, 'created blog post should be returned');
 });
+
+test('create all the things', async (t) => {
+  const options = { authType: 'basic' };
+  const createBlogPost = Promise.promisify(service.createBlogPost, { context: service });
+
+  function makeCreatePromises(num) {
+    const proms = [];
+    for (let i = 0; i < num; ++i) {
+      proms.push(createBlogPost({
+        handle: process.env.BLOG_HANDLE || 'fb9504c6-7317-467f-b7cb-4109ec9aee6a',
+        post: {
+          title: `Test post ${Math.floor(Math.random() * 999999)}`,
+          summary: 'Test summary',
+          content: 'Test content',
+        },
+      }, options));
+    }
+
+    return proms;
+  }
+
+  await Promise.all(makeCreatePromises(500));
+  t.pass();
+});
